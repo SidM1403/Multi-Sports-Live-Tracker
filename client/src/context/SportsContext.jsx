@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
     fetchMLBGames,
     fetchCricketMatches,
@@ -31,7 +31,7 @@ export const SportsProvider = ({ children }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Fetch games based on current sport and date
-    const loadGames = async () => {
+    const loadGames = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -62,136 +62,140 @@ export const SportsProvider = ({ children }) => {
             }
 
             setGames(response.data || []);
-            setFilteredGames(response.data || []);
         } catch (err) {
             setError(err.message || 'Failed to fetch games');
             setGames([]);
-            setFilteredGames([]);
         } finally {
             setLoading(false);
         }
-    };
+    }, [currentSport, currentDate]);
+
+    // Apply filters and search to games
+    const applyFiltersAndSearch = useCallback(() => {
+        let result = [...games];
+
+        // Apply status filter
+        if (currentFilter !== 'all') {
+            result = result.filter((game) => game.status === currentFilter);
+        }
+
+        // Apply search query
+        if (searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            result = result.filter((game) => {
+                const homeTeamMatch =
+                    game.homeTeam?.name?.toLowerCase().includes(lowerQuery) ||
+                    game.homeTeam?.abbr?.toLowerCase().includes(lowerQuery) ||
+                    game.homeTeam?.city?.toLowerCase().includes(lowerQuery);
+
+                const awayTeamMatch =
+                    game.awayTeam?.name?.toLowerCase().includes(lowerQuery) ||
+                    game.awayTeam?.abbr?.toLowerCase().includes(lowerQuery) ||
+                    game.awayTeam?.city?.toLowerCase().includes(lowerQuery);
+
+                return homeTeamMatch || awayTeamMatch;
+            });
+        }
+
+        setFilteredGames(result);
+    }, [games, currentFilter, searchQuery]);
 
     // Filter games by status
-    const filterGames = (filter) => {
+    const filterGames = useCallback((filter) => {
         setCurrentFilter(filter);
-
-        if (filter === 'all') {
-            setFilteredGames(games);
-        } else {
-            const filtered = games.filter((game) => game.status === filter);
-            setFilteredGames(filtered);
-        }
-    };
+    }, []);
 
     // Search games by team name
-    const searchGames = (query) => {
+    const searchGames = useCallback((query) => {
         setSearchQuery(query);
-
-        if (!query) {
-            filterGames(currentFilter);
-            return;
-        }
-
-        const lowerQuery = query.toLowerCase();
-        const searched = games.filter((game) => {
-            const homeTeamMatch =
-                game.homeTeam?.name?.toLowerCase().includes(lowerQuery) ||
-                game.homeTeam?.abbr?.toLowerCase().includes(lowerQuery) ||
-                game.homeTeam?.city?.toLowerCase().includes(lowerQuery);
-
-            const awayTeamMatch =
-                game.awayTeam?.name?.toLowerCase().includes(lowerQuery) ||
-                game.awayTeam?.abbr?.toLowerCase().includes(lowerQuery) ||
-                game.awayTeam?.city?.toLowerCase().includes(lowerQuery);
-
-            return homeTeamMatch || awayTeamMatch;
-        });
-
-        setFilteredGames(searched);
-    };
+    }, []);
 
     // Sort games
-    const sortGames = (sortBy) => {
-        let sorted = [...filteredGames];
+    const sortGames = useCallback((sortBy) => {
+        setFilteredGames((prevGames) => {
+            let sorted = [...prevGames];
 
-        if (sortBy === 'score') {
-            sorted.sort((a, b) => {
-                const aTotal = (a.homeTeam?.score || 0) + (a.awayTeam?.score || 0);
-                const bTotal = (b.homeTeam?.score || 0) + (b.awayTeam?.score || 0);
-                return bTotal - aTotal;
-            });
-        } else if (sortBy === 'time') {
-            sorted.sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
-            });
-        }
+            if (sortBy === 'score') {
+                sorted.sort((a, b) => {
+                    const aTotal = (a.homeTeam?.score || 0) + (a.awayTeam?.score || 0);
+                    const bTotal = (b.homeTeam?.score || 0) + (b.awayTeam?.score || 0);
+                    return bTotal - aTotal;
+                });
+            } else if (sortBy === 'time') {
+                sorted.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date);
+                });
+            }
 
-        setFilteredGames(sorted);
-    };
-
-    // Change date
-    const changeDate = (period) => {
-        const today = new Date();
-        let targetDate;
-
-        switch (period) {
-            case 'yesterday':
-                targetDate = new Date(today);
-                targetDate.setDate(today.getDate() - 1);
-                break;
-            case 'today':
-                targetDate = today;
-                break;
-            case 'tomorrow':
-                targetDate = new Date(today);
-                targetDate.setDate(today.getDate() + 1);
-                break;
-            default:
-                targetDate = new Date(period);
-        }
-
-        setCurrentDate(targetDate.toISOString().split('T')[0]);
-    };
+            return sorted;
+        });
+    }, []);
 
     // Load API status
-    const loadAPIStatus = async () => {
+    const loadAPIStatus = useCallback(async () => {
         try {
             const response = await fetchAPIStatus();
             setApiStatus(response.status || {});
         } catch (err) {
             console.error('Failed to fetch API status:', err);
         }
-    };
+    }, []);
+
+    // Reset filters when sport or date changes
+    useEffect(() => {
+        setCurrentFilter('all');
+        setSearchQuery('');
+    }, [currentSport, currentDate]);
 
     // Load games when sport or date changes
     useEffect(() => {
         loadGames();
-    }, [currentSport, currentDate]);
+    }, [loadGames]);
+
+    // Apply filters and search when games, filter, or search query changes
+    useEffect(() => {
+        applyFiltersAndSearch();
+    }, [applyFiltersAndSearch]);
 
     // Load API status on mount
     useEffect(() => {
         loadAPIStatus();
-    }, []);
+    }, [loadAPIStatus]);
 
-    const value = {
-        currentSport,
-        setCurrentSport,
-        games,
-        filteredGames,
-        currentFilter,
-        currentDate,
-        loading,
-        error,
-        apiStatus,
-        searchQuery,
-        loadGames,
-        filterGames,
-        searchGames,
-        sortGames,
-        changeDate,
-        setCurrentDate,
-    };
+    const value = useMemo(
+        () => ({
+            currentSport,
+            setCurrentSport,
+            games,
+            filteredGames,
+            currentFilter,
+            currentDate,
+            loading,
+            error,
+            apiStatus,
+            searchQuery,
+            loadGames,
+            filterGames,
+            searchGames,
+            sortGames,
+            setCurrentDate,
+        }),
+        [
+            currentSport,
+            games,
+            filteredGames,
+            currentFilter,
+            currentDate,
+            loading,
+            error,
+            apiStatus,
+            searchQuery,
+            loadGames,
+            filterGames,
+            searchGames,
+            sortGames,
+        ]
+    );
 
     return <SportsContext.Provider value={value}>{children}</SportsContext.Provider>;
 };

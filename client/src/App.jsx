@@ -4,12 +4,7 @@ import { SportsProvider } from './context/SportsContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
-import MLBPage from './pages/MLBPage';
-import CricketPage from './pages/CricketPage';
-import MLSPage from './pages/MLSPage';
-import NHLPage from './pages/NHLPage';
-import NBAPage from './pages/NBAPage';
-import FootballPage from './pages/FootballPage';
+import SportPage from './pages/SportPage';
 import './styles/App.css';
 
 function App() {
@@ -19,20 +14,13 @@ function App() {
                 <Router>
                     <div className="app">
                         <Navbar />
-                        <div className="app-container">
-                            <Sidebar />
-                            <main className="main-content">
-                                <Routes>
-                                    <Route path="/" element={<Navigate to="/mlb" replace />} />
-                                    <Route path="/mlb" element={<MLBPage />} />
-                                    <Route path="/cricket" element={<CricketPage />} />
-                                    <Route path="/mls" element={<MLSPage />} />
-                                    <Route path="/nhl" element={<NHLPage />} />
-                                    <Route path="/nba" element={<NBAPage />} />
-                                    <Route path="/football" element={<FootballPage />} />
-                                </Routes>
-                            </main>
-                        </div>
+                        <Sidebar />
+                        <main className="main-content">
+                            <Routes>
+                                <Route path="/" element={<Navigate to="/mlb" replace />} />
+                                <Route path="/:sport" element={<SportPage />} />
+                            </Routes>
+                        </main>
                     </div>
                 </Router>
             </SportsProvider>

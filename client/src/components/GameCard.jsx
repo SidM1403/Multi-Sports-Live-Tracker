@@ -20,7 +20,7 @@ const GameCard = ({ game, sport }) => {
         const maxInnings = Math.max(9, game.homeLineScore.length, game.awayLineScore.length);
 
         return (
-            <div className="score-grid-base mlb-line-score">
+            <div className="mlb-line-score">
                 <div className="line-score-header">Team</div>
                 {[...Array(maxInnings)].map((_, i) => (
                     <div key={i} className="line-score-header">{i + 1}</div>
@@ -100,7 +100,13 @@ const GameCard = ({ game, sport }) => {
             )}
 
             {game.venue && (
-                <div className="game-venue">📍 {game.venue}</div>
+                <div className="game-venue">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {game.venue}
+                </div>
             )}
         </div>
     );

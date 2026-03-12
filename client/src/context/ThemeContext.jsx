@@ -6,7 +6,7 @@ export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => {
         // Check localStorage for saved theme
         const savedTheme = localStorage.getItem('theme');
-        return savedTheme || 'dark'; // Default to dark for retro feel
+        return savedTheme || 'light'; // Default to light for minimalistic design
     });
 
     useEffect(() => {

@@ -1,125 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSports } from '../context/SportsContext';
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { setCurrentSport, filterGames, currentDate, setCurrentDate } = useSports();
-    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const sports = [
-        { id: 'mlb', label: 'MLB', icon: '⚾', path: '/mlb', color: '#0066cc' },
-        { id: 'cricket', label: 'Cricket', icon: '🏏', path: '/cricket', color: '#00a651' },
-        { id: 'mls', label: 'MLS', icon: '⚽', path: '/mls', color: '#e31c23' },
-        { id: 'nhl', label: 'NHL', icon: '🏒', path: '/nhl', color: '#0066cc' },
-        { id: 'nba', label: 'NBA', icon: '🏀', path: '/nba', color: '#ff6b00' },
-        { id: 'football', label: 'Football', icon: '⚽', path: '/football', color: '#00a651' },
+        { id: 'mlb', label: 'MLB', path: '/mlb', color: '#3b82f6' },
+        { id: 'cricket', label: 'Cricket', path: '/cricket', color: '#10b981' },
+        { id: 'mls', label: 'MLS', path: '/mls', color: '#ef4444' },
+        { id: 'nhl', label: 'NHL', path: '/nhl', color: '#8b5cf6' },
+        { id: 'nba', label: 'NBA', path: '/nba', color: '#f59e0b' },
+        { id: 'football', label: 'Football', path: '/football', color: '#06b6d4' },
     ];
 
-    const handleSportClick = (sport, path) => {
-        setCurrentSport(sport);
+    const handleSportClick = (path) => {
         navigate(path);
     };
 
-    const handleQuickFilter = (filterType) => {
-        switch (filterType) {
-            case 'live':
-                filterGames('live');
-                break;
-            case 'today':
-                const today = new Date().toISOString().split('T')[0];
-                setCurrentDate(today);
-                filterGames('all');
-                break;
-            case 'favorites':
-                // Placeholder for favorites functionality
-                alert('Favorites feature coming soon!');
-                break;
-            default:
-                filterGames('all');
-        }
-    };
-
     return (
-        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-            <div className="sidebar-section">
-                <div className="sidebar-title">Sports</div>
-                <ul className="sidebar-menu">
-                    {sports.map((sport) => (
-                        <li key={sport.id} className="sidebar-item">
-                            <a
-                                href="#"
-                                className={`sidebar-link ${location.pathname === sport.path || (location.pathname === '/' && sport.id === 'mlb')
-                                        ? 'active'
-                                        : ''
-                                    }`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleSportClick(sport.id, sport.path);
-                                }}
-                            >
-                                <span className="sidebar-icon">{sport.icon}</span>
-                                {!isCollapsed && <span>{sport.label}</span>}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
+        <div className="horizontal-sidebar">
+            <div className="sidebar-label">Sports</div>
+            <div className="sidebar-tabs">
+                {sports.map((sport) => (
+                    <button
+                        key={sport.id}
+                        className={`sidebar-tab ${location.pathname === sport.path ||
+                                (location.pathname === '/' && sport.id === 'mlb')
+                                ? 'active'
+                                : ''
+                            }`}
+                        style={{
+                            '--sport-color': sport.color
+                        }}
+                        onClick={() => handleSportClick(sport.path)}
+                    >
+                        <span className="tab-label">{sport.label}</span>
+                    </button>
+                ))}
             </div>
-
-            <div className="sidebar-section">
-                <div className="sidebar-title">Quick Filters</div>
-                <ul className="sidebar-menu">
-                    <li className="sidebar-item">
-                        <a
-                            href="#"
-                            className="sidebar-link"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleQuickFilter('live');
-                            }}
-                        >
-                            <span className="sidebar-icon">🔴</span>
-                            {!isCollapsed && <span>Live Now</span>}
-                        </a>
-                    </li>
-                    <li className="sidebar-item">
-                        <a
-                            href="#"
-                            className="sidebar-link"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleQuickFilter('favorites');
-                            }}
-                        >
-                            <span className="sidebar-icon">⭐</span>
-                            {!isCollapsed && <span>Favorites</span>}
-                        </a>
-                    </li>
-                    <li className="sidebar-item">
-                        <a
-                            href="#"
-                            className="sidebar-link"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                handleQuickFilter('today');
-                            }}
-                        >
-                            <span className="sidebar-icon">📅</span>
-                            {!isCollapsed && <span>Today</span>}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <button
-                className="btn btn-outline btn-sm"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                style={{ width: '100%', marginTop: 'auto' }}
-            >
-                {isCollapsed ? '→' : '←'}
-            </button>
-        </aside>
+        </div>
     );
 };
 

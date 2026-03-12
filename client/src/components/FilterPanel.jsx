@@ -2,26 +2,20 @@ import React, { useState } from 'react';
 import { useSports } from '../context/SportsContext';
 
 const FilterPanel = () => {
-    const { currentFilter, filterGames, sortGames, searchGames } = useSports();
+    const { currentFilter, filterGames, sortGames } = useSports();
     const [isExpanded, setIsExpanded] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const statusFilters = [
-        { id: 'all', label: 'All Games', icon: '📊' },
-        { id: 'live', label: 'Live', icon: '🔴' },
-        { id: 'final', label: 'Final', icon: '✅' },
-        { id: 'scheduled', label: 'Scheduled', icon: '📅' },
+        { id: 'all', label: 'All Games' },
+        { id: 'live', label: 'Live' },
+        { id: 'final', label: 'Final' },
+        { id: 'scheduled', label: 'Scheduled' },
     ];
 
     const sortOptions = [
-        { id: 'time', label: 'By Time', icon: '⏰' },
-        { id: 'score', label: 'By Score', icon: '🔢' },
+        { id: 'time', label: 'By Time' },
+        { id: 'score', label: 'By Score' },
     ];
-
-    const handleSearch = (value) => {
-        setSearchTerm(value);
-        searchGames(value);
-    };
 
     return (
         <div className="filter-panel">
@@ -47,8 +41,7 @@ const FilterPanel = () => {
                                         }`}
                                     onClick={() => filterGames(filter.id)}
                                 >
-                                    <span>{filter.icon}</span>
-                                    <span>{filter.label}</span>
+                                    {filter.label}
                                 </button>
                             ))}
                         </div>
@@ -63,24 +56,9 @@ const FilterPanel = () => {
                                     className="btn btn-sm btn-outline"
                                     onClick={() => sortGames(option.id)}
                                 >
-                                    <span>{option.icon}</span>
-                                    <span>{option.label}</span>
+                                    {option.label}
                                 </button>
                             ))}
-                        </div>
-                    </div>
-
-                    <div className="filter-group">
-                        <label className="filter-label">Search Teams</label>
-                        <div className="search-bar">
-                            <span className="search-icon">🔍</span>
-                            <input
-                                type="text"
-                                className="search-input"
-                                placeholder="Search by team name..."
-                                value={searchTerm}
-                                onChange={(e) => handleSearch(e.target.value)}
-                            />
                         </div>
                     </div>
                 </div>

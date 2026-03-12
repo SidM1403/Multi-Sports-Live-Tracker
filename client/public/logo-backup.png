@@ -1,0 +1,27 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#3b82f6" opacity="0.1"/>
+  
+  <!-- SJ Letters -->
+  <g transform="translate(100, 100)">
+    <!-- S Letter -->
+    <path d="M -45 -35 Q -45 -50, -30 -50 L -10 -50 Q 5 -50, 5 -35 Q 5 -20, -10 -20 L -30 -20 Q -45 -20, -45 -5 Q -45 10, -30 10 L -10 10 Q 5 10, 5 25 Q 5 40, -10 40 L -30 40 Q -45 40, -45 25" 
+          fill="none" 
+          stroke="#334155" 
+          stroke-width="12" 
+          stroke-linecap="round"/>
+    
+    <!-- J Letter -->
+    <path d="M 15 -50 L 15 25 Q 15 40, 30 40 L 40 40 Q 55 40, 55 25" 
+          fill="none" 
+          stroke="#3b82f6" 
+          stroke-width="12" 
+          stroke-linecap="round"/>
+    
+    <!-- Accent dot on J -->
+    <circle cx="15" cy="-60" r="6" fill="#3b82f6"/>
+  </g>
+  
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.3"/>
+</svg>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSports } from '../context/SportsContext';
-import EnhancedGameCard from './EnhancedGameCard';
+import GameCard from './GameCard';
 import LoadingSkeleton from './LoadingSkeleton';
 import EmptyState from './EmptyState';
 
@@ -8,17 +8,21 @@ const GameGrid = ({ sport }) => {
     const { filteredGames, loading, error } = useSports();
 
     if (loading) {
-        return <LoadingSkeleton count={6} />;
+        return (
+            <div className="games-grid">
+                {[...Array(6)].map((_, index) => (
+                    <LoadingSkeleton key={index} />
+                ))}
+            </div>
+        );
     }
 
     if (error) {
         return (
             <EmptyState
                 icon="⚠️"
-                title="Oops! Something went wrong"
+                title="Error Loading Games"
                 message={error}
-                actionLabel="Try Again"
-                onAction={() => window.location.reload()}
             />
         );
     }
@@ -27,16 +31,16 @@ const GameGrid = ({ sport }) => {
         return (
             <EmptyState
                 icon="🏟️"
-                title="No games found"
-                message="There are no games matching your current filters. Try adjusting your search or date selection."
+                title="No Games Found"
+                message="Try adjusting your filters or selecting a different date."
             />
         );
     }
 
     return (
         <div className="games-grid">
-            {filteredGames.map((game) => (
-                <EnhancedGameCard key={game.id} game={game} sport={sport} />
+            {filteredGames.map((game, index) => (
+                <GameCard key={game.id || index} game={game} sport={sport} />
             ))}
         </div>
     );
